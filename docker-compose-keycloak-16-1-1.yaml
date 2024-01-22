@@ -1,0 +1,32 @@
+version: '3.1'
+
+volumes:
+  postgres_data:
+      driver: local
+
+services:
+  postgres:
+    image: docker.io/postgres:11.21-alpine3.17
+    restart: always
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    environment:
+      POSTGRES_DB: kc
+      POSTGRES_USER: kc
+      POSTGRES_PASSWORD: pw
+  keycloak:
+    image: docker.io/jboss/keycloak:16.1.1
+    environment:
+      DB_VENDOR: POSTGRES
+      DB_ADDR: postgres
+      DB_DATABASE: kc
+      DB_USER: kc
+      DB_SCHEMA: public
+      DB_PASSWORD: pw
+      KEYCLOAK_USER: admin
+      KEYCLOAK_PASSWORD: pwkc
+      PROXY_ADDRESS_FORWARDING: "true"
+    ports:
+      - 127.0.0.1:8085:8080
+    depends_on:
+      - postgres
